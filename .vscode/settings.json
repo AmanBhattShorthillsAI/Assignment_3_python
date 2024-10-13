@@ -1,0 +1,27 @@
+{
+    "wolf.disableHotModeWarning": true,
+    "cSpell.words": [
+        "annot",
+        "Annots",
+        "cropbox",
+        "csvfile",
+        "executemany",
+        "fitz",
+        "laparams",
+        "mediabox",
+        "pdfdocument",
+        "pdfinterp",
+        "pdfminer",
+        "pdfpage",
+        "pdfparser",
+        "pdfplumber",
+        "pikepdf",
+        "rels",
+        "reltype",
+        "rsrcmgr",
+        "shtlp"
+    ],
+    "python.analysis.extraPaths": [
+        "./data_extractor/file_loaders"
+    ]
+}

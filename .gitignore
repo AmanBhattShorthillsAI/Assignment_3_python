@@ -1,11 +1,8 @@
-# Ignore .vscode folder
-.vscode/
-
-# Ignore extracted-data folder
-extracted-data/
-
-# Ignore my_env folder
-my_env/
-
-# Ignore assignment4.db file
+!.vscode/*
+.vscode
+!extracted-data/*
+extracted-data
+!my_env/*
+my_env
+!assignment4.db
 assignment4.db

@@ -16,7 +16,7 @@ class FileStorage(Storage):
         if data_type == 'text':
             self.save_text(data, filename)
         elif data_type == 'image':
-            self.save_images(data, filename)
+            return self.save_images(data, filename)
         elif data_type == 'url':
             self.save_urls(data, filename)
         elif data_type == 'table':
@@ -71,6 +71,7 @@ class FileStorage(Storage):
         metadata_file = os.path.join(images_dir, 'metadata.json')
         with open(metadata_file, 'w') as f:
             json.dump(metadata, f, indent=4)
+        return metadata
 
     def save_urls(self, urls, filename: str):
         urls_dir = os.path.join(self.output_dir, "urls")

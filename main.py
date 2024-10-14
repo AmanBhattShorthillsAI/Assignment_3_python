@@ -61,8 +61,9 @@ def main():
     file_storage.store(extracted_text, os.path.basename(file_path), 'text')
 
     # Save the extracted images
+    image_data = None
     if images:
-        file_storage.store(images, os.path.basename(file_path), 'image')
+        image_data = file_storage.store(images, os.path.basename(file_path), 'image')
 
     # Save the extracted URLs (if any)
     if urls:
@@ -75,14 +76,14 @@ def main():
     print(f"Extracted data saved to: {output_dir}")
     
     # Create an instance of SQLStorage
-    sql_storage = SQLStorage()
+    sql_storage = SQLStorage('assignment4.db')
 
     # Store the extracted text in the SQL database
     sql_storage.store("text", extracted_text)
 
     # Store the extracted images in the SQL database
     if images:
-        sql_storage.store("image", images)
+        sql_storage.store("image", image_data)
 
     # Store the extracted URLs in the SQL database
     if urls:

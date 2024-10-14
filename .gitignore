@@ -14,3 +14,5 @@ data_extractor/storage/__pycache__
 data_extractor/tests/__pycache__
 extracted_data
 /home/shtlp_0071/Documents/assignment4/data_extractor/file_loaders/__pycache__
+/home/shtlp_0071/Documents/assignment4/data_extractor/tests/__pycache__
+.pytest_cache

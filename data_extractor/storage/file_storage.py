@@ -2,25 +2,16 @@ import os
 import json
 import pandas as pd  # For saving tables as CSV
 from io import BytesIO
-from PIL import Image as PILImage  # For handling PPTX images
+from PIL import Image as PILImage
+from data_extractor.storage.storage import Storage  # For handling PPTX images
 
-class FileStorage:
+class FileStorage(Storage):
     def __init__(self, output_dir: str):
-        """
-        Initialize the FileStorage with the given output directory.
-
-        If the directory does not exist, it will be created.
-
-        Parameters
-        ----------
-        output_dir : str
-            The output directory to use for saving files.
-        """
         self.output_dir = output_dir
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-    def save(self, data, filename: str, data_type: str):
+    def store(self, data, filename: str, data_type: str):
         """Save data based on type: 'text', 'image', 'url', or 'table'."""
         if data_type == 'text':
             self.save_text(data, filename)
@@ -103,20 +94,36 @@ class FileStorage:
             json.dump(metadata, f, indent=4)
 
     def save_tables(self, tables, filename: str):
-        """Save extracted tables as CSV files."""
+        """Save extracted tables as CSV files and generate metadata."""
         tables_dir = os.path.join(self.output_dir, "tables")
         if not os.path.exists(tables_dir):
             os.makedirs(tables_dir)
 
+        metadata = []
         for idx, table in enumerate(tables):
             csv_filename = f"table_{idx + 1}.csv"
             csv_path = os.path.join(tables_dir, csv_filename)
             
-            # Check if the table is a DataFrame (from PDF extraction)
+            # Save table data to CSV file
             if isinstance(table, pd.DataFrame):
                 table.to_csv(csv_path, index=False)
-            # Otherwise, treat it as a list (from DOCX or PPTX extraction)
             elif isinstance(table, list):
                 with open(csv_path, 'w', newline='') as f:
                     for row in table:
                         f.write(",".join(row) + "\n")
+            
+            # Add metadata for the current table
+            metadata.append({
+                "table_filename": csv_filename,
+                "row_count": len(table) if isinstance(table, list) else table.shape[0],
+                "column_count": len(table[0]) if isinstance(table, list) and table else table.shape[1]
+            })
+
+        # Save the metadata for all tables in a JSON file
+        metadata_file = os.path.join(tables_dir, "metadata.json")
+        with open(metadata_file, 'w') as f:
+            json.dump(metadata, f, indent=4)
+                        
+    def close(self):
+        pass
+

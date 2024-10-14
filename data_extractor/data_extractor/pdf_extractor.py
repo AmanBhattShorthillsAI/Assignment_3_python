@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 import fitz
 import pdfplumber
-from data_extractor.extractor.extractor import Extractor
+from data_extractor.data_extractor.extractor import Extractor
 
 class PDFExtractor(Extractor):
     def __init__(self, loader):

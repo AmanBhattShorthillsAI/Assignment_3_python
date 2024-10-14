@@ -1,11 +1,10 @@
 import os
-from data_extractor.extractor.docx_extractor import DOCXExtractor
-from data_extractor.extractor.pdf_extractor import PDFExtractor
-from data_extractor.extractor.pptx_extractor import PPTXExtractor
+from data_extractor.data_extractor.docx_extractor import DOCXExtractor
+from data_extractor.data_extractor.pdf_extractor import PDFExtractor
+from data_extractor.data_extractor.pptx_extractor import PPTXExtractor
 from data_extractor.file_loaders.pdf_loader import PDFLoader
 from data_extractor.file_loaders.docx_loader import DOCXLoader
 from data_extractor.file_loaders.ppt_loader import PPTLoader
-# from data_extractor.data_extractor import DataExtractor
 from data_extractor.storage.file_storage import FileStorage
 from data_extractor.storage.sql_storage import SQLStorage
 
@@ -23,58 +22,35 @@ def main():
     Returns:
         None
     """
-    file_path = "/home/shtlp_0071/Downloads/sample_pdf.pdf"  # Change this to the file you want to process
+    file_path = "/home/shtlp_0071/Documents/assignment4/files/Networks 1.pptx"  # Change this to the file you want to process
 
     # Determine the file type and use the appropriate loader
     if file_path.endswith(".pdf"):
         loader = PDFLoader()
         extractor = PDFExtractor(loader)
     elif file_path.endswith(".docx"):
-        loader = DOCXLoader(file_path)
+        loader = DOCXLoader()
         extractor = DOCXExtractor(loader)
-    elif file_path.endswith(".pptx"):
-        loader = PPTLoader(file_path)
+    elif file_path.endswith(".pptx") or file_path.endswith(".ppt"):
+        loader = PPTLoader()
         extractor = PPTXExtractor(loader)
     else:
         raise ValueError("Unsupported file format. Use PDF, DOCX, or PPTX.")
 
-    # Validate the file (ensures it's the correct type)
-    # loader.validate_file(file_path)
-
-    # Load the file using the appropriate loader
-    # loader.load_file()
-    
-    # if file_path.endswith(".pdf"):
-    #     # extractor = PDFExtractor(file_path)
-    # elif file_path.endswith(".docx"):
-    #     # extractor = DOCXExtractor(file_path)
-    #     pass
-    # elif file_path.endswith(".pptx"):
-    #     # extractor = PPTXExtractor(file_path)
-    #     pass
-    # else:
-    #     raise ValueError("Unsupported file format. Use PDF, DOCX, or PPTX.")
-
-    # # Create an instance of DataExtractor for extracting content
-    # extractor = DataExtractor(loader)
-
     # Extract text from the file
     extractor.load(file_path)
     extracted_text = extractor.extract_text()
+    # print(extracted_text)
 
     # Extract images (if available)
     images = extractor.extract_images()
 
     # Extract URLs (if it's a PDF or DOCX)
     urls = extractor.extract_urls() 
-    print(urls)
+    # print(urls)
 
     # Extract tables (for PDFs or DOCX only)
     tables = extractor.extract_tables()
-
-    # Close the file (if applicable)
-    # if hasattr(loader, 'close_file'):
-    #     loader.close_file()
 
     # Create a folder for storing the extracted data
     base_name = os.path.splitext(os.path.basename(file_path))[0]
@@ -82,19 +58,19 @@ def main():
     file_storage = FileStorage(output_dir)
 
     # Save the extracted text
-    file_storage.save(extracted_text, os.path.basename(file_path), 'text')
+    file_storage.store(extracted_text, os.path.basename(file_path), 'text')
 
     # Save the extracted images
     if images:
-        file_storage.save(images, os.path.basename(file_path), 'image')
+        file_storage.store(images, os.path.basename(file_path), 'image')
 
     # Save the extracted URLs (if any)
     if urls:
-        file_storage.save(urls, os.path.basename(file_path), 'url')
+        file_storage.store(urls, os.path.basename(file_path), 'url')
 
     # Save the extracted tables (if any)
     if tables:
-        file_storage.save(tables, os.path.basename(file_path), 'table')
+        file_storage.store(tables, os.path.basename(file_path), 'table')
 
     print(f"Extracted data saved to: {output_dir}")
     
@@ -112,10 +88,10 @@ def main():
     if urls:
         sql_storage.store("url", urls)
 
-    # # Store the extracted tables in the SQL database
-    # if tables:
-    #     for table in tables:
-    #         sql_storage.store("table", table)
+    # Store the extracted tables in the SQL database
+    if tables:
+        for table in tables:
+            sql_storage.store("data_table", table)
 
     print("Data stored in SQL database")
     sql_storage.close()

@@ -1,7 +1,7 @@
 import sys
 import os
 
-from data_extractor.extractor.pdf_extractor import PDFExtractor
+from data_extractor.data_extractor.pdf_extractor import PDFExtractor
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 import unittest

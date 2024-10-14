@@ -82,7 +82,6 @@ class FileStorage:
             json.dump(metadata, f, indent=4)
 
     def save_urls(self, urls, filename: str):
-        """Save URLs to a .txt file and metadata to a .json file."""
         urls_dir = os.path.join(self.output_dir, "urls")
         if not os.path.exists(urls_dir):
             os.makedirs(urls_dir)
@@ -94,9 +93,9 @@ class FileStorage:
             for url_info in urls:
                 url_file.write(f"{url_info['url']}\n")
                 metadata.append({
+                    "linked_text": url_info["linked_text"],
                     "url": url_info["url"],
-                    "page_number": url_info["page"],
-                    "position": url_info["position"]
+                    "page_number": url_info["page_number"]
                 })
 
         metadata_file = os.path.join(urls_dir, "metadata.json")

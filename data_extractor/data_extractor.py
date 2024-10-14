@@ -3,6 +3,8 @@ import fitz
 import pdfplumber
 from PyPDF2 import PdfReader
 
+from data_extractor.extractor.pdf_extractor import PDFExtractor
+
 class DataExtractor:
     def __init__(self, loader):
         self.loader = loader
@@ -26,12 +28,14 @@ class DataExtractor:
             ValueError: If the file type is not supported for text extraction.
         """
         if self.file_path.endswith('.pdf'):
-            # Extract text from PDF
-            reader = self.loader.load_file()
-            text = ""
-            for page in reader.pages:
-                text += page.extract_text()
-            return text
+            # # Extract text from PDF
+            # reader = self.loader.load_file()
+            # text = ""
+            # for page in reader.pages:
+            #     text += page.extract_text()
+            # return text
+            loader = PDFExtractor(self.file_path)
+            loader.extract_text()
 
         elif self.file_path.endswith('.docx'):
             # Extract text from DOCX
@@ -150,67 +154,26 @@ class DataExtractor:
         return images
 
     def extract_urls(self):
-        """
-        Extract URLs from the given file.
-
-        URLs are extracted from PDF, DOCX, and PPTX files.
-
-        Parameters
-        ----------
-        self : DataExtractor
-            The data extractor object.
-
-        Returns
-        -------
-        list
-            A list of URLs found in the file.
-
-        Notes
-        -----
-        The URLs are extracted from text in the file using a regular expression.
-        For PDFs, the URLs are extracted from text in the PDF. For DOCX and PPTX,
-        the URLs are extracted from hyperlinks in the document.
-        """
         urls = []
-
-        if self.file_path.endswith('.pdf'):
-            # Use PdfReader instead of PdfFileReader
-            pdf_reader = PdfReader(self.file_path)
-            for page_number in range(len(pdf_reader.pages)):
-                page = pdf_reader.pages[page_number]
-                pdf_text = page.extract_text()  # Updated method to extract text
-                # Use regex to find URLs
-                regex = r"(https?://\S+)"
-                url = re.findall(regex, pdf_text)
-                urls += [x for x in url]  # Add found URLs to the list
-
-        elif self.file_path.endswith('.docx'):
-            # DOCX URL extraction using python-docx
-            doc = self.loader.load_file()
-            for paragraph in doc.paragraphs:
-                for run in paragraph.runs:
-                    # Check if the run has a hyperlink
-                    hyperlink = run.element.xpath(".//w:hyperlink")
-                    if hyperlink:
-                        for link in hyperlink:
-                            r_id = link.get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id")
-                            # Get the actual URL from the relationship
-                            if r_id and r_id in doc.part.rels:
-                                url = doc.part.rels[r_id].target_ref
-                                urls.append(url)
-
-        elif self.file_path.endswith('.pptx'):
-            # PPTX URL extraction using python-pptx
-            ppt = self.loader.load_file()
-            for slide in ppt.slides:
-                for shape in slide.shapes:
-                    if shape.has_text_frame:
-                        for paragraph in shape.text_frame.paragraphs:
-                            for run in paragraph.runs:
-                                # Extract the hyperlink, if present
-                                hyperlink = run.hyperlink
-                                if hyperlink and hyperlink.address:
-                                    urls.append(hyperlink.address)
+        pdf_document = fitz.open(self.file)
+        for page_num in range(len(pdf_document)):
+            page = pdf_document.load_page(page_num)
+            links = page.get_links()
+            for link in links:
+                if "uri" in link:
+                    url = link["uri"]
+                    rect = link["from"]
+                    urls.append({
+                        "url": url,
+                        "page": page_num + 1,
+                        "position": {
+                            "x0": rect.x0,
+                            "y0": rect.y0,
+                            "x1": rect.x1,
+                            "y1": rect.y1
+                        }
+                    })
+        pdf_document.close()
         return urls
 
         

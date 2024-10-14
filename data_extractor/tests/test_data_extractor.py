@@ -1,9 +1,10 @@
 import sys
 import os
+
+from data_extractor.extractor.pdf_extractor import PDFExtractor
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 import unittest
-from data_extractor.data_extractor import DataExtractor
 from data_extractor.file_loaders.pdf_loader import PDFLoader
 
 class TestDataExtractor(unittest.TestCase):
@@ -25,7 +26,7 @@ class TestDataExtractor(unittest.TestCase):
         None
         """
         loader = PDFLoader()
-        extractor = DataExtractor(loader)
+        extractor = PDFExtractor(loader)
         data = extractor.extract_data("/home/shtlp_0071/Documents/assignment4/files/sample.pdf")
         self.assertIsInstance(data, list)
 
@@ -46,7 +47,7 @@ class TestDataExtractor(unittest.TestCase):
         None
         """
         loader = PDFLoader()
-        extractor = DataExtractor(loader)
+        extractor = PDFExtractor(loader)
         data = extractor.extract_data("/home/shtlp_0071/Documents/assignment4/files/empty.pdf")
         self.assertEqual(data, [])
 
@@ -67,7 +68,7 @@ class TestDataExtractor(unittest.TestCase):
         None
         """
         loader = PDFLoader()
-        extractor = DataExtractor(loader)
+        extractor = PDFExtractor(loader)
         with self.assertRaises(FileNotFoundError):
             extractor.extract_data("/home/shtlp_0071/Documents/assignment4/files/non_existent_file.pdf")
 

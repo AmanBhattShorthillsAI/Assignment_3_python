@@ -6,3 +6,10 @@ extracted-data
 my_env
 !assignment4.db
 assignment4.db
+data_extractor.py
+.coverage
+__pycache__
+data_extractor/file_loaders/__pycache__
+data_extractor/storage/__pycache__
+data_extractor/tests/__pycache__
+extracted_data

@@ -1,8 +1,11 @@
 import os
+from data_extractor.extractor.docx_extractor import DOCXExtractor
+from data_extractor.extractor.pdf_extractor import PDFExtractor
+from data_extractor.extractor.pptx_extractor import PPTXExtractor
 from data_extractor.file_loaders.pdf_loader import PDFLoader
 from data_extractor.file_loaders.docx_loader import DOCXLoader
 from data_extractor.file_loaders.ppt_loader import PPTLoader
-from data_extractor.data_extractor import DataExtractor
+# from data_extractor.data_extractor import DataExtractor
 from data_extractor.storage.file_storage import FileStorage
 from data_extractor.storage.sql_storage import SQLStorage
 
@@ -20,43 +23,58 @@ def main():
     Returns:
         None
     """
-    file_path = "/home/shtlp_0071/Documents/assignment4/files/sample.pdf"  # Change this to the file you want to process
+    file_path = "/home/shtlp_0071/Downloads/sample_pdf.pdf"  # Change this to the file you want to process
 
     # Determine the file type and use the appropriate loader
     if file_path.endswith(".pdf"):
-        loader = PDFLoader(file_path)
+        loader = PDFLoader()
+        extractor = PDFExtractor(loader)
     elif file_path.endswith(".docx"):
         loader = DOCXLoader(file_path)
+        extractor = DOCXExtractor(loader)
     elif file_path.endswith(".pptx"):
         loader = PPTLoader(file_path)
+        extractor = PPTXExtractor(loader)
     else:
         raise ValueError("Unsupported file format. Use PDF, DOCX, or PPTX.")
 
     # Validate the file (ensures it's the correct type)
-    loader.validate_file()
+    # loader.validate_file(file_path)
 
     # Load the file using the appropriate loader
-    loader.load_file()
+    # loader.load_file()
+    
+    # if file_path.endswith(".pdf"):
+    #     # extractor = PDFExtractor(file_path)
+    # elif file_path.endswith(".docx"):
+    #     # extractor = DOCXExtractor(file_path)
+    #     pass
+    # elif file_path.endswith(".pptx"):
+    #     # extractor = PPTXExtractor(file_path)
+    #     pass
+    # else:
+    #     raise ValueError("Unsupported file format. Use PDF, DOCX, or PPTX.")
 
-    # Create an instance of DataExtractor for extracting content
-    extractor = DataExtractor(loader)
+    # # Create an instance of DataExtractor for extracting content
+    # extractor = DataExtractor(loader)
 
     # Extract text from the file
+    extractor.load(file_path)
     extracted_text = extractor.extract_text()
 
     # Extract images (if available)
     images = extractor.extract_images()
 
     # Extract URLs (if it's a PDF or DOCX)
-    urls = extractor.extract_urls() if file_path.endswith(('.pdf', '.docx')) else None
+    urls = extractor.extract_urls() 
     print(urls)
 
     # Extract tables (for PDFs or DOCX only)
-    tables = extractor.extract_tables() if file_path.endswith(('.pdf', '.docx')) else None
+    tables = extractor.extract_tables()
 
     # Close the file (if applicable)
-    if hasattr(loader, 'close_file'):
-        loader.close_file()
+    # if hasattr(loader, 'close_file'):
+    #     loader.close_file()
 
     # Create a folder for storing the extracted data
     base_name = os.path.splitext(os.path.basename(file_path))[0]
@@ -101,7 +119,7 @@ def main():
 
     print("Data stored in SQL database")
     sql_storage.close()
-    loader.close_file()
+    # loader.close_file()
 
 if __name__ == "__main__":
     main()

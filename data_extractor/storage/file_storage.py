@@ -111,7 +111,9 @@ class FileStorage(Storage):
             elif isinstance(table, list):
                 with open(csv_path, 'w', newline='') as f:
                     for row in table:
-                        f.write(",".join(row) + "\n")
+                        # Convert None values to empty strings before joining
+                        cleaned_row = [str(item) if item is not None else "" for item in row]
+                        f.write(",".join(cleaned_row) + "\n")
             
             # Add metadata for the current table
             metadata.append({
@@ -124,6 +126,7 @@ class FileStorage(Storage):
         metadata_file = os.path.join(tables_dir, "metadata.json")
         with open(metadata_file, 'w') as f:
             json.dump(metadata, f, indent=4)
+
                         
     def close(self):
         pass

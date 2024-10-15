@@ -1,6 +1,8 @@
 from typing import Any, Dict, List
 import fitz
+from pdf2image import convert_from_path
 import pdfplumber
+import pytesseract
 from data_extractor.data_extractor.extractor import Extractor
 
 class PDFExtractor(Extractor):
@@ -8,18 +10,25 @@ class PDFExtractor(Extractor):
         self.loader = loader
         self.file = None
         self.file_path = None
-        
+
     def load(self, file_path):
         """Load the file using the appropriate loader based on file type."""
         self.file = self.loader.load_file(file_path)
         self.file_path = file_path 
         
     def extract_text(self):
-        # Extract text from PDF
-        reader = self.loader.load_file(self.file_path)
+        # # Extract text from PDF
+        # reader = self.loader.load_file(self.file_path)
+        # text = ""
+        # for page in reader.pages:
+        #     text += pytesseract.image_to_string(page, lang='eng')
+        # return text
+        
+        pages = convert_from_path(self.file_path)
         text = ""
-        for page in reader.pages:
-            text += page.extract_text()
+        for page in pages:
+            # Use pytesseract to extract text from the image
+            text += pytesseract.image_to_string(page, lang='eng')  # Change 'eng' to the appropriate language code if needed
         return text
 
     def extract_images(self):

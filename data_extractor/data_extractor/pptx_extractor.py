@@ -1,5 +1,4 @@
 from typing import Any, Dict, List
-import fitz
 from data_extractor.data_extractor.extractor import Extractor
 
 class PPTXExtractor(Extractor):

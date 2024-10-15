@@ -1,6 +1,7 @@
 from sqlite3 import Error
 from unittest.mock import MagicMock, patch
 import pytest
+
 from data_extractor.file_loaders.docx_loader import DOCXLoader
 from data_extractor.file_loaders.pdf_loader import PDFLoader
 from data_extractor.file_loaders.ppt_loader import PPTLoader
@@ -163,8 +164,6 @@ def test_validate_pptx_with_custom_slide_layouts(ppt_loader):
     custom_layout_pptx_path = "test_files/pptx/large.pptx"
     assert ppt_loader.load_file(custom_layout_pptx_path), f"Loaded PPTX file: {custom_layout_pptx_path}"
     
-    
-    
 @pytest.fixture
 def valid_db_path():
     """Fixture for the valid SQLite database path."""
@@ -201,6 +200,7 @@ def test_validate_failed_database_connection(mocker, invalid_db_path):
     mocker.patch('sqlite3.connect', side_effect=Error("Failed to connect"))
     with pytest.raises(SystemExit):  # Assuming your code exits on failure
         SQLStorage(database=invalid_db_path)
+
 
 def test_retrieve_all_stored_text_data(sql_storage, mock_cursor):
     """Test retrieving all stored text data."""

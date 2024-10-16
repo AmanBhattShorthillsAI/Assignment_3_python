@@ -18,6 +18,13 @@ pip install -r requirements.txt
 ```
 Run the project with `python main.py` command in terminal and give the absolute path of file you want to extract as an input.
 
+## Run the project
+After cloning the project, run the `main.py` file.
+```bash
+python main.py
+```
+and provide the path of file as an **input**.
+
 ## Loaders
 The `data_extractor` directory features the following loaders, which facilitate data extraction from various file types:
 

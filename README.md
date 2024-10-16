@@ -1,4 +1,4 @@
-# Assignment-3 Python
+# Assignment-4 Python
 
 ## Python VERSION
 The python version **`3.12.3`**, and rest packages versions are mentioned in `requirements.txt` file.
@@ -6,8 +6,17 @@ The python version **`3.12.3`**, and rest packages versions are mentioned in `re
 ## Overview
 The `data_extractor` directory houses a set of tools specifically designed to extract data from various file formats and efficiently store the resulting information.
 
-## How to Use
-To begin, clone the repository with command `git clone https://github.com/AmanBhattShorthillsAI/Assignment_3_python.git` and run the `requirements.txt` file to install the packages used in the project. <br>Run the project with `python main.py` command in terminal and give the absolute path of file you want to extract as an input.</br>
+## Installation
+To begin, clone the repository with command file to install the packages used in the project. 
+
+```bash
+git clone https://github.com/AmanBhattShorthillsAI/Assignment_3_python.git
+``` 
+and run the `requirements.txt` 
+```bash
+pip install -r requirements.txt
+```
+Run the project with `python main.py` command in terminal and give the absolute path of file you want to extract as an input.
 
 ## Loaders
 The `data_extractor` directory features the following loaders, which facilitate data extraction from various file types:
@@ -29,7 +38,14 @@ The `data_extractor` directory offers the following storage solutions for managi
 - **SQLStorage**: Saves the extracted data in a SQLite database.
 
 ## How to see the database
-Run the command `sqlite3 <DATABASE_NAME>.db` in the terminal and see the tables made using `.tables` and retrieve the content from the table using `SELECT * FROM <TABLE_NAME>`.
+Run the command 
+```bash
+sqlite3 <DATABASE_NAME>.db
+``` 
+in the terminal and see the tables made using `.tables` and retrieve the content from the table using 
+```bash
+SELECT * FROM <TABLE_NAME>
+```
 
 ## Functionality
 The `data_extractor` offers the following features:
@@ -41,7 +57,11 @@ The `data_extractor` offers the following features:
 ## Unit Tests
 The unit tests are written using `pytest` framework inside `data_extractor/tests/test_extractor.py` file.
 
-- Run the unit test file using `python -m pytest <FILE_PATH> -vv` command. 
+- Run the unit test file using 
+```bash
+python -m pytest <FILE_PATH> -vv
+``` 
+command. 
 - The `-vv` is for **verbose** to see the exact number of errors and problem where the errors/failures arises
 
 ## Purpose

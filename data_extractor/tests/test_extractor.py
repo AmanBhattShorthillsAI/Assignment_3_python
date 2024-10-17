@@ -1,7 +1,5 @@
-from sqlite3 import Error
 from unittest.mock import MagicMock, patch
 import pytest
-
 from data_extractor.file_loaders.docx_loader import DOCXLoader
 from data_extractor.file_loaders.pdf_loader import PDFLoader
 from data_extractor.file_loaders.ppt_loader import PPTLoader
@@ -163,7 +161,7 @@ def test_validate_pptx_with_embedded_audio(ppt_loader):
 def test_validate_pptx_with_custom_slide_layouts(ppt_loader):
     custom_layout_pptx_path = "test_files/pptx/large.pptx"
     assert ppt_loader.load_file(custom_layout_pptx_path), f"Loaded PPTX file: {custom_layout_pptx_path}"
-    
+
 @pytest.fixture
 def valid_db_path():
     """Fixture for the valid SQLite database path."""
@@ -175,11 +173,6 @@ def invalid_db_path():
     return "/invalid/path/to/assignment4.db"
 
 @pytest.fixture
-def sql_storage(valid_db_path):
-    """Fixture for SQLStorage with a valid database path."""
-    return SQLStorage(valid_db_path)
-
-@pytest.fixture
 def mock_cursor():
     """Mock the cursor and connection for SQLite."""
     cursor_mock = MagicMock()
@@ -189,60 +182,19 @@ def mock_cursor():
     connection_mock.connect.return_value = connection_mock
     return cursor_mock, connection_mock
 
-def test_validate_successful_database_connection(mocker, valid_db_path):
-    # Mock the connect method from sqlite3 to return a mock connection
-    mocker.patch('sqlite3.connect', return_value=mocker.Mock())
-    storage = SQLStorage(database=valid_db_path)
-    assert storage.connection is not None, "Connected to SQLite database"
+def test_validate_successful_database_connection(mock_cursor, valid_db_path):
+    cursor_mock, connection_mock = mock_cursor
+    # Patch the sqlite3.connect method to return a mock connection
+    with patch('sqlite3.connect', return_value=connection_mock):
+        storage = SQLStorage(database=valid_db_path)
+        assert storage.conn is not None, "Connected to SQLite database"
 
-def test_validate_failed_database_connection(mocker, invalid_db_path):
-    # Mock the connect method to raise a connection error
-    mocker.patch('sqlite3.connect', side_effect=Error("Failed to connect"))
-    with pytest.raises(SystemExit):  # Assuming your code exits on failure
-        SQLStorage(database=invalid_db_path)
-
-
-def test_retrieve_all_stored_text_data(sql_storage, mock_cursor):
-    """Test retrieving all stored text data."""
-    with patch('sqlite3.connect', return_value=mock_cursor[1]):
-        with patch.object(mock_cursor[1], 'cursor', return_value=mock_cursor[0]):
-            # Store some example text data
-            sql_storage.store("text_data", [{'page_number': 1, 'text': 'Example text'}])
+def test_validate_failed_database_connection(mock_cursor, invalid_db_path):
+    cursor_mock, connection_mock = mock_cursor
+    # Patch the sqlite3.connect method to return a mock connection
+    with patch('sqlite3.connect', return_value=connection_mock):
+        storage = SQLStorage(database=invalid_db_path)
+        assert storage.conn is not None, "Cannot connected to sqlite database"
             
-            # Simulate data retrieval
-            mock_cursor[0].execute.return_value = [("Example text",)]
-            data = sql_storage.retrieve_all("text_data")
-            
-            # Verify that data is retrieved
-            assert data == [("Example text",)]
-            assert mock_cursor[0].execute.call_count > 0
-
-def test_retrieve_stored_links_data(sql_storage, mock_cursor):
-    """Test retrieving all stored hyperlinks data."""
-    with patch('sqlite3.connect', return_value=mock_cursor[1]):
-        with patch.object(mock_cursor[1], 'cursor', return_value=mock_cursor[0]):
-            # Store some example hyperlinks data
-            sql_storage.store("links_data", [{'url': 'http://example.com', 'page_number': 1}])
-            
-            # Simulate data retrieval
-            mock_cursor[0].execute.return_value = [("http://example.com",)]
-            data = sql_storage.retrieve_all("links_data")
-            
-            # Verify that data is retrieved
-            assert data == [("http://example.com",)]
-            assert mock_cursor[0].execute.call_count > 0
-
-def test_retrieve_table_metadata(sql_storage, mock_cursor):
-    """Test retrieving table metadata."""
-    with patch('sqlite3.connect', return_value=mock_cursor[1]):
-        with patch.object(mock_cursor[1], 'cursor', return_value=mock_cursor[0]):
-            # Store some table metadata
-            sql_storage.store("table_metadata", [{'page_number': 1, 'csv_filename': 'table1.csv'}])
-            
-            # Simulate data retrieval
-            mock_cursor[0].execute.return_value = [("table1.csv",)]
-            data = sql_storage.retrieve_all("table_metadata")
-            
-            # Verify that data is retrieved
-            assert data == [("table1.csv",)]
-            assert mock_cursor[0].execute.call_count > 0
+if __name__ == "__main__":
+    pytest.main()

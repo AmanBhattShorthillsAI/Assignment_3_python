@@ -19,10 +19,10 @@ class FileStorage(Storage):
             return self.save_images(data, filename)
         elif data_type == 'url':
             self.save_urls(data, filename)
-        elif data_type == 'table':
+        elif data_type == 'data_table':
             self.save_tables(data, filename)
         else:
-            raise ValueError("Unsupported data type. Use 'text', 'image', 'url', or 'table'.")
+            raise ValueError("Unsupported data type. Use 'text', 'image', 'url', or 'data_table'.")
 
     def save_text(self, data, filename: str):
         """Save text data as a .txt file."""

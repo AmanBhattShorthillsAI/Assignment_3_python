@@ -4,59 +4,48 @@ class SQLStorage(Storage):
     def __init__(self, database):
         super().__init__(database)
 
-    def store(self, table_name, data):
-        # Sanitize the table_name variable
+    def store(self, table_name, data, filename):
         """
-        Stores data in a SQL database.
+        Stores data and filename in a SQL database.
 
         :param table_name: The name of the table to store the data in.
+        :param filename: The name of the file the data was extracted from.
         :param data: The data to be stored.
         """
         self.table_name = table_name.replace(" ", "_").replace("-", "_")
 
-        # Create the table if it doesn't exist
+        # Create the table if it doesn't exist, with an additional 'filename' column
         escaped_table_name = f'"{self.table_name}"'
 
-        # Create the table if it doesn't exist
-        self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS {escaped_table_name} (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        data TEXT
-        )""")
+        # Use the same table creation logic for both 'image' and other table types
+        if table_name == 'image':
+            self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS {escaped_table_name} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                filename TEXT,
+                page_number INT,
+                data TEXT
+            )""")
+            # Insert data for the 'image' table
+            for entry in data:
+                self.cursor.execute(
+                    f"INSERT INTO {escaped_table_name} (filename, page_number, data) VALUES (?, ?, ?)",
+                    (filename, entry['page'], str(entry['image_data']))
+                )
+        else:
+            # Create a table for text or other data types
+            self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS {escaped_table_name} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                filename TEXT,
+                data TEXT
+            )""")
+            # Insert data for the non-image table
+            self.cursor.execute(
+                f"INSERT INTO {escaped_table_name} (filename, data) VALUES (?, ?)",
+                (filename, str(data))
+            )
 
-        # Escape the table name to avoid syntax issues
-        escaped_table_name = f'"{self.table_name}"'
-
-        # Insert the data into the table
-        self.cursor.execute(f"INSERT INTO {escaped_table_name} (data) VALUES (?)", (str(data),))
-
-        # Commit the changes
+        # Commit the changes to the database
         self.conn.commit()
 
-    def retrieve_all(self, table_name):
-        """
-        Retrieves all data from the specified table.
-
-        :param table_name: The name of the table to retrieve data from.
-        :return: List of all rows in the table.
-        """
-        escaped_table_name = f'"{table_name}"'
-        self.cursor.execute(f"SELECT * FROM {escaped_table_name}")
-        return self.cursor.fetchall()
-
-    def retrieve_by_id(self, table_name, row_id):
-        """
-        Retrieves a single row by its ID from the specified table.
-
-        :param table_name: The name of the table.
-        :param row_id: The ID of the row to retrieve.
-        :return: The row with the specified ID.
-        """
-        escaped_table_name = f'"{table_name}"'
-        self.cursor.execute(f"SELECT * FROM {escaped_table_name} WHERE id = ?", (row_id,))
-        return self.cursor.fetchone()
-
     def close(self):
-        """
-        Closes the connection to the database.
-        """
         self.conn.close()

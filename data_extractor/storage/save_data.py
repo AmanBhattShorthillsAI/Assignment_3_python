@@ -7,6 +7,7 @@ load_dotenv()
 class SaveData():
     def __init__(self, dataToBeSaved, file_path):
         self.file_path = file_path
+        self.fileName = os.path.basename(file_path) 
         self.database_name = os.getenv("DATABASE_NAME")
         self.table_name_text = os.getenv("TABLE_NAME_TEXT")
         self.table_name_image = os.getenv("TABLE_NAME_IMAGE")
@@ -47,20 +48,20 @@ class SaveData():
         sql_storage = SQLStorage(self.database_name)
 
         # Store the extracted text in the SQL database
-        sql_storage.store(self.table_name_text, self.extracted_text)
+        sql_storage.store(self.table_name_text, self.extracted_text, self.fileName)
 
         # Store the extracted images in the SQL database
         if self.extracted_images:
-            sql_storage.store(self.table_name_image, self.extracted_images)
+            sql_storage.store(self.table_name_image, self.extracted_images, self.fileName)
 
         # Store the extracted URLs in the SQL database
         if self.extracted_urls:
-            sql_storage.store(self.table_name_url, self.extracted_urls)
+            sql_storage.store(self.table_name_url, self.extracted_urls, self.fileName)
 
         # Store the extracted tables in the SQL database
         if self.extracted_tables:
             for table in self.extracted_tables:
-                sql_storage.store(self.table_name_data_table, table)
+                sql_storage.store(self.table_name_data_table, table, self.fileName)
 
         print("Data stored in SQL database")
         sql_storage.close()

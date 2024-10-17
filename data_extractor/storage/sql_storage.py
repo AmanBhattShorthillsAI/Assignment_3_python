@@ -17,34 +17,30 @@ class SQLStorage(Storage):
         # Create the table if it doesn't exist, with an additional 'filename' column
         escaped_table_name = f'"{self.table_name}"'
 
-        # Use the same table creation logic for both 'image' and other table types
-        if table_name == 'image':
+        if(table_name == 'image'):
             self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS {escaped_table_name} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                filename TEXT,
-                page_number INT,
-                data TEXT
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            filename TEXT,
+            page_number INT,
+            data TEXT
             )""")
-            # Insert data for the 'image' table
-            for entry in data:
-                self.cursor.execute(
-                    f"INSERT INTO {escaped_table_name} (filename, page_number, data) VALUES (?, ?, ?)",
-                    (filename, entry['page'], str(entry['image_data']))
-                )
         else:
-            # Create a table for text or other data types
             self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS {escaped_table_name} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 filename TEXT,
                 data TEXT
             )""")
-            # Insert data for the non-image table
-            self.cursor.execute(
-                f"INSERT INTO {escaped_table_name} (filename, data) VALUES (?, ?)",
-                (filename, str(data))
-            )
 
-        # Commit the changes to the database
+        # Insert the filename and data into the table
+        if(table_name == 'image'):
+            # print(data)
+            for i in range(len(data)):
+                self.cursor.execute(f"INSERT INTO {escaped_table_name} (filename, page_number, data) VALUES (?, ?, ?)", (filename, data[i]['page'], str(data[i]['image_data'])))
+            # self.cursor.execute(f"INSERT INTO {escaped_table_name} (filename, page_number, data) VALUES (?, ?, ?)", (filename, data['page_number'], str(data['data'])))
+        else:
+            self.cursor.execute(f"INSERT INTO {escaped_table_name} (filename, data) VALUES (?, ?)", (filename, str(data)))
+
+        # Commit the changes
         self.conn.commit()
 
     def close(self):

@@ -42,7 +42,8 @@ class DOCXExtractor(Extractor):
                 if image_blob is not None:
                     images.append({
                         "image_data": image_blob,
-                        "ext": image_ext
+                        "ext": image_ext,
+                        "page": rel.target_ref
                     })
         doc = None  # Explicitly close the document
         return images
